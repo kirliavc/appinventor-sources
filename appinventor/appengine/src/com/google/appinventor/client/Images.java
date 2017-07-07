@@ -508,6 +508,13 @@ public interface Images extends Resources {
    */
   @Source("com/google/appinventor/images/procedures.png")
   ImageResource procedures();
+  
+  /**
+    * Designer palette item: PieChart
+    */
+  @Source("com/google/appinventor/images/pieChart.png")
+  ImageResource pieChart();
+  
   /**
     * Designer palette item: MediaStore
     */

@@ -2638,6 +2638,11 @@ public interface OdeMessages extends Messages {
   @Description("")
   String webViewerComponentPallette();
 
+  @DefaultMessage("PieChart")
+  @Description("")
+  String pieChartComponentPallette();
+
+  
   // Component Properties
   @DefaultMessage("AboutScreen")
   @Description("")
@@ -6067,6 +6072,9 @@ public interface OdeMessages extends Messages {
   @Description("")
   String FirebaseDBHelpStringComponentPallette();
 
+  @DefaultMessage("Try using this component to create a pie chart.")
+  @Description("")
+  String PieChartHelpStringComponentPallette();
 
   //Ode.java messages
   @DefaultMessage("Welcome to App Inventor 2!")

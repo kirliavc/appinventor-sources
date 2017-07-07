@@ -40,6 +40,7 @@ import com.google.appinventor.client.editor.simple.components.MockTimePicker;
 import com.google.appinventor.client.editor.simple.components.MockVerticalArrangement;
 import com.google.appinventor.client.editor.simple.components.MockVideoPlayer;
 import com.google.appinventor.client.editor.simple.components.MockWebViewer;
+import com.google.appinventor.client.editor.simple.components.MockPieChart;
 
 import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.common.collect.Maps;
@@ -132,6 +133,7 @@ public final class SimpleComponentDescriptor {
     bundledImages.put("images/twitter.png", images.twitterComponent());
     bundledImages.put("images/voting.png", images.voting());
     bundledImages.put("images/web.png", images.web());
+    bundledImages.put("images/pieChart.png", images.pieChart());
     bundledImages.put("images/mediastore.png", images.mediastore());
     bundledImages.put("images/sharing.png", images.sharingComponent());
     bundledImages.put("images/spinner.png", images.spinner());
@@ -372,6 +374,8 @@ public final class SimpleComponentDescriptor {
       return new MockVideoPlayer(editor);
     } else if (name.equals(MockWebViewer.TYPE)) {
       return new MockWebViewer(editor);
+    } else if (name.equals(MockPieChart.TYPE)) {
+      return new MockPieChart(editor);
     } else if (name.equals(MockSpinner.TYPE)) {
       return new MockSpinner(editor);
     } else {

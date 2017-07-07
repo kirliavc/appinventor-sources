@@ -43,7 +43,10 @@ public abstract class MockVisibleComponent extends MockComponent {
   protected static final String PROPERTY_NAME_HEIGHT = "Height";
   protected static final String PROPERTY_NAME_COLUMN = "Column";
   protected static final String PROPERTY_NAME_ROW = "Row";
-
+  
+  //chart title
+  protected static final String PROPERTY_NAME_CHART_TITLE = "Title";
+  
   // Note: the values below are duplicated in Component.java
   // If you change them here, change them there!
 
