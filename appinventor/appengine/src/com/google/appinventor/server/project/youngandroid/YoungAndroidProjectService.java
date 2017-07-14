@@ -723,7 +723,8 @@ public final class YoungAndroidProjectService extends CommonProjectService {
       }
     } else {
       // TODO(user): Figure out how to make this more generic
-      return "localhost:8888";
+      return "localhost:5011";
+      //return "localhost:8888";
     }
   }
 
