@@ -9,6 +9,7 @@ import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
 import com.google.appinventor.components.annotations.PropertyCategory;
 import com.google.appinventor.components.annotations.SimpleObject;
+import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.annotations.UsesLibraries;
 import com.google.appinventor.components.common.ComponentCategory;
@@ -22,6 +23,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -56,12 +58,34 @@ public final class PieChart extends AndroidViewComponent {
     // Adds the component to its designated container
     
     PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
+    ArrayList<Integer> colors = new ArrayList<Integer>();
+
+    for (int c : ColorTemplate.VORDIPLOM_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.JOYFUL_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.COLORFUL_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.LIBERTY_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.PASTEL_COLORS)
+        colors.add(c);
+
+    colors.add(ColorTemplate.getHoloBlue());
+    pieDataSet.setColors(colors);
     PieData pieData=new PieData();
     pieData.setDataSet(pieDataSet);
     IPieDataSet ipds=pieData.getDataSet();
     ipds.addEntry(new PieEntry((float) ((Math.random() * 1) + 1 / 5),
             (float)(ipds.getEntryCount()))
     );
+    
+
+    
     pieData.setDataSet(ipds);
     pieChart.setData(pieData);
     pieChart.invalidate();
@@ -99,5 +123,14 @@ public final class PieChart extends AndroidViewComponent {
   @SimpleProperty
   public void Title(String text) {
     pieChart.getData().getDataSet().setLabel(text);
+  }
+
+  @SimpleFunction(description = "Add an entry to the chart")
+  public void AddEntry(float value,String label){
+    IPieDataSet iPieDataSet = pieChart.getData().getDataSet();
+    iPieDataSet.addEntry(new PieEntry(value,label));
+    pieChart.getData().notifyDataChanged();
+    pieChart.notifyDataSetChanged();
+    pieChart.invalidate();
   }
 }

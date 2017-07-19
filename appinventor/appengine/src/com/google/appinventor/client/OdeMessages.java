@@ -4337,6 +4337,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String widthParams();
 
+  @DefaultMessage("label")
+  @Description("")
+  String labelParams();
+
   //Events
   @DefaultMessage("AccelerationChanged")
   @Description("")
@@ -6443,4 +6447,8 @@ public interface OdeMessages extends Messages {
   @Description("")
   String reloadWindow();
 
+  @DefaultMessage("AddEntry")
+  @Description("")
+  String AddEntryMethods();
+  
 }
