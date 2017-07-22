@@ -24,9 +24,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.components.Legend;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
+import android.graphics.Color;
 
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
     description = "PieChart Component",
@@ -42,6 +44,7 @@ public final class PieChart extends AndroidViewComponent {
   //private final TextView view;
   private final com.github.mikephil.charting.charts.PieChart pieChart;
   private final ComponentContainer container;
+  private ArrayList<Integer> colors;
   /**
    * Creates a new component.
    *
@@ -58,7 +61,7 @@ public final class PieChart extends AndroidViewComponent {
     // Adds the component to its designated container
     
     PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
-    ArrayList<Integer> colors = new ArrayList<Integer>();
+    colors = new ArrayList<Integer>();
 
     for (int c : ColorTemplate.VORDIPLOM_COLORS)
         colors.add(c);
@@ -79,6 +82,9 @@ public final class PieChart extends AndroidViewComponent {
     pieDataSet.setColors(colors);
     PieData pieData=new PieData();
     pieData.setDataSet(pieDataSet);
+    pieData.setValueTextSize(11f);
+    pieData.setValueTextColor(Color.WHITE);
+    /*
     IPieDataSet ipds=pieData.getDataSet();
     ipds.addEntry(new PieEntry((float) ((Math.random() * 1) + 1 / 5),
             (float)(ipds.getEntryCount()))
@@ -87,9 +93,11 @@ public final class PieChart extends AndroidViewComponent {
 
     
     pieData.setDataSet(ipds);
+    */
     pieChart.setData(pieData);
+    pieChart.setDrawHoleEnabled(false);
     pieChart.invalidate();
-    Title("12345");
+    pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
     Toast.makeText(container.$context(), Title(), Toast.LENGTH_SHORT).show();
     // Default property values
   }
@@ -132,5 +140,110 @@ public final class PieChart extends AndroidViewComponent {
     pieChart.getData().notifyDataChanged();
     pieChart.notifyDataSetChanged();
     pieChart.invalidate();
+  }
+
+  /**
+   * Specifies whether the label of entries is shown
+   *
+   * @param enable a boolean value 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty
+  public void LabelEnabled(boolean enabled) {
+    pieChart.setDrawEntryLabels(enabled);
+    pieChart.invalidate();
+  }
+  /**
+   * returns whether the label is shown in chart
+   *
+   * @return a boolean balue
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty
+  public boolean LabelEnabled() {
+    return pieChart.isDrawEntryLabelsEnabled();
+  }
+
+  /**
+   * Specifies whether the legend is shown
+   *
+   * @param enable a boolean value 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty
+  public void LegendEnabled(boolean enabled) {
+    Legend legend=pieChart.getLegend();
+    legend.setEnabled(enabled);
+    pieChart.invalidate();
+  }
+  /**
+   * returns whether the label is shown in chart
+   *
+   * @return a boolean balue
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty
+  public boolean LegendEnabled() {
+    return pieChart.getLegend().isEnabled();
+  }
+
+  
+
+  /**
+   * Specifies the value's text color of the chart as an 
+   * alpha-red-green-blue integer.
+   *
+   * @param argb  text RGB color with alpha
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
+  @SimpleProperty
+  public void ValueTextColor(int argb) {
+    pieChart.getData().setValueTextColor(argb);
+  }
+
+  /**
+   * Specifies the label's text color of the chart as an 
+   * alpha-red-green-blue integer.
+   *
+   * @param argb  text RGB color with alpha
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
+  @SimpleProperty
+  public void LabelTextColor(int argb) {
+    pieChart.setEntryLabelColor(argb);
+  }
+
+  /**
+   * Specifies the value text's size, measured in sp
+   * (scale-independent pixels).
+   *
+   * @param size  font size in sp(scale-independent pixels)
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "")
+  @SimpleProperty(
+      category = PropertyCategory.APPEARANCE)
+  public void ValueTextSize(float size) {
+    pieChart.getData().setValueTextSize(size);
+  }
+
+  /**
+   * Specifies the label text's size, measured in sp
+   * (scale-independent pixels).
+   *
+   * @param size  font size in sp(scale-independent pixels)
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "")
+  @SimpleProperty(
+      category = PropertyCategory.APPEARANCE)
+  public void LabelTextSize(float size) {
+    pieChart.setEntryLabelTextSize(size);
   }
 }

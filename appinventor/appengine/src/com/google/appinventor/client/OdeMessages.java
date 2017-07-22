@@ -6451,4 +6451,29 @@ public interface OdeMessages extends Messages {
   @Description("")
   String AddEntryMethods();
   
+  @DefaultMessage("LabelEnabled")
+  @Description("")
+  String LabelEnabledProperties();
+
+  @DefaultMessage("LegendEnabled")
+  @Description("")
+  String LegendEnabledProperties();
+
+  @DefaultMessage("ValueTextColor")
+  @Description("")
+  String ValueTextColorProperties();
+
+  @DefaultMessage("LabelTextColor")
+  @Description("")
+  String LabelTextColorProperties();
+
+  @DefaultMessage("ValueTextSize")
+  @Description("")
+  String ValueTextSizeProperties();
+
+  @DefaultMessage("LabelTextSize")
+  @Description("")
+  String LabelTextSizeProperties();
+
 }
+
