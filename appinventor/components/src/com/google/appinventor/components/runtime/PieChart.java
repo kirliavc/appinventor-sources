@@ -18,6 +18,7 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
+import com.google.appinventor.components.runtime.util.YailList;
 
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
+import gnu.math.IntNum;
 
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
     description = "PieChart Component",
@@ -128,24 +130,28 @@ public final class PieChart extends AndroidViewComponent {
    */
   @SimpleFunction(description = "Add an entry to the chart")
   public void AddEntry(float value,String label){
-    IPieDataSet iPieDataSet = pieChart.getData().getDataSet();
     PieEntry pieEntry=new PieEntry(value,label);
     entries.add(pieEntry);
-    iPieDataSet.addEntry(pieEntry);
+    //iPieDataSet.addEntry(pieEntry);
     pieChart.getData().notifyDataChanged();
     pieChart.notifyDataSetChanged();
     pieChart.invalidate();
   }
 
   /**
-   * Set colors of the chart, not supported!
+   * Set colors of the chart
    *
    * @param colors a list of colors (integer values).
    */
-  //@SimpleFunction(description = "set the color list of the pie chart")
-  public void SetColorList(List<Integer> colors){
-    PieDataSet pieDataSet=new PieDataSet(entries,Title());
+  @SimpleFunction(description = "set the color list of the pie chart")
+  public void SetColorList(YailList list){
+    colors=new ArrayList<Integer>();
+    for(Object obj : list.toArray()){
+      colors.add(gnu.math.IntNum.intValue(obj));
+    }
     addColorTemplates(colors);
+    Toast.makeText(container.$context(), ""+entries.size(), Toast.LENGTH_SHORT).show();
+    PieDataSet pieDataSet=new PieDataSet(entries,Title());
     pieDataSet.setColors(colors);
     pieChart.getData().setDataSet(pieDataSet);
     pieChart.getData().notifyDataChanged();
