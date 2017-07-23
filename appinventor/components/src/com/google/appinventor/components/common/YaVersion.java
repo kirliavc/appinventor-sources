@@ -1049,6 +1049,14 @@ public class YaVersion {
   // - Initial Version.
   public static final int PIECHART_COMPONENT_VERSION = 1;
 
+  //For LINECHART_VERSION 1:
+  // - Initial Version.
+  public static final int LINECHART_COMPONENT_VERSION = 1;
+
+  //For BARCHART_VERSION 1:
+  // - Initial Version.
+  public static final int BARCHART_COMPONENT_VERSION = 1;
+
   //For PROXIMITYSENSOR_COMPONENT_VERSION: Initial Version
   public static final int PROXIMITYSENSOR_COMPONENT_VERSION = 1;
 

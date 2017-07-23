@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.InlineLabel;
 /**
  * PieChart component.
  *
- * @author email@example.com (First Last)
+ * @author ids@pku.edu.cn (Liancheng Jia)
  */
 public final class MockPieChart extends MockVisibleComponent{
 

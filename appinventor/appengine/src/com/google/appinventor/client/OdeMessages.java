@@ -2642,6 +2642,14 @@ public interface OdeMessages extends Messages {
   @Description("")
   String pieChartComponentPallette();
 
+  @DefaultMessage("BarChart")
+  @Description("")
+  String barChartComponentPallette();
+
+  @DefaultMessage("LineChart")
+  @Description("")
+  String lineChartComponentPallette();
+
   
   // Component Properties
   @DefaultMessage("AboutScreen")
@@ -4340,6 +4348,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("label")
   @Description("")
   String labelParams();
+
+  @DefaultMessage("colors")
+  @Description("")
+  String colorsParams();
 
   //Events
   @DefaultMessage("AccelerationChanged")
@@ -6076,9 +6088,18 @@ public interface OdeMessages extends Messages {
   @Description("")
   String FirebaseDBHelpStringComponentPallette();
 
-  @DefaultMessage("Try using this component to create a pie chart.")
+  @DefaultMessage("Use this component to create a pie chart.")
   @Description("")
   String PieChartHelpStringComponentPallette();
+
+
+  @DefaultMessage("Use this component to create a bar chart.")
+  @Description("")
+  String BarChartHelpStringComponentPallette();
+
+  @DefaultMessage("Use this component to create a line chart.")
+  @Description("")
+  String LineChartHelpStringComponentPallette();
 
   //Ode.java messages
   @DefaultMessage("Welcome to App Inventor 2!")
@@ -6450,6 +6471,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("AddEntry")
   @Description("")
   String AddEntryMethods();
+
+  @DefaultMessage("SetColorList")
+  @Description("")
+  String SetColorListMethods();
   
   @DefaultMessage("LabelEnabled")
   @Description("")
@@ -6475,5 +6500,8 @@ public interface OdeMessages extends Messages {
   @Description("")
   String LabelTextSizeProperties();
 
+  @DefaultMessage("CenterHoleRadius")
+  @Description("")
+  String CenterHoleRadiusProperties();
 }
 

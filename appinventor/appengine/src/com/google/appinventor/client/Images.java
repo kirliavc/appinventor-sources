@@ -514,6 +514,18 @@ public interface Images extends Resources {
     */
   @Source("com/google/appinventor/images/pieChart.png")
   ImageResource pieChart();
+
+  /**
+    * Designer palette item: BarChart
+    */
+  @Source("com/google/appinventor/images/barChart.png")
+  ImageResource barChart();
+
+  /**
+    * Designer palette item: LineChart
+    */
+  @Source("com/google/appinventor/images/lineChart.png")
+  ImageResource lineChart();
   
   /**
     * Designer palette item: MediaStore

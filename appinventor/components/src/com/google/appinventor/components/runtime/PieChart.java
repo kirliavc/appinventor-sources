@@ -1,7 +1,8 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
 // Copyright 2011-2012 MIT, All rights reserved
-// Released under the MIT License https://raw.github.com/mit-cml/app-inventor/master/mitlicense.txt
+// Released under the Apache License, Version 2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 
 package com.google.appinventor.components.runtime;
 
@@ -18,7 +19,6 @@ import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
 
-//import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -28,6 +28,7 @@ import com.github.mikephil.charting.components.Legend;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.List;
 import android.graphics.Color;
 
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
@@ -44,7 +45,8 @@ public final class PieChart extends AndroidViewComponent {
   //private final TextView view;
   private final com.github.mikephil.charting.charts.PieChart pieChart;
   private final ComponentContainer container;
-  private ArrayList<Integer> colors;
+  private List<Integer> colors;
+  private ArrayList<PieEntry> entries; 
   /**
    * Creates a new component.
    *
@@ -62,23 +64,8 @@ public final class PieChart extends AndroidViewComponent {
     
     PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
     colors = new ArrayList<Integer>();
-
-    for (int c : ColorTemplate.VORDIPLOM_COLORS)
-        colors.add(c);
-
-    for (int c : ColorTemplate.JOYFUL_COLORS)
-        colors.add(c);
-
-    for (int c : ColorTemplate.COLORFUL_COLORS)
-        colors.add(c);
-
-    for (int c : ColorTemplate.LIBERTY_COLORS)
-        colors.add(c);
-
-    for (int c : ColorTemplate.PASTEL_COLORS)
-        colors.add(c);
-
-    colors.add(ColorTemplate.getHoloBlue());
+    entries = new ArrayList<PieEntry>();
+    addColorTemplates(colors);
     pieDataSet.setColors(colors);
     PieData pieData=new PieData();
     pieData.setDataSet(pieDataSet);
@@ -133,15 +120,38 @@ public final class PieChart extends AndroidViewComponent {
     pieChart.getData().getDataSet().setLabel(text);
   }
 
+  /**
+   * Add an entry to the chart
+   *
+   * @param value value of the entry
+   * @param label label text of the entry
+   */
   @SimpleFunction(description = "Add an entry to the chart")
   public void AddEntry(float value,String label){
     IPieDataSet iPieDataSet = pieChart.getData().getDataSet();
-    iPieDataSet.addEntry(new PieEntry(value,label));
+    PieEntry pieEntry=new PieEntry(value,label);
+    entries.add(pieEntry);
+    iPieDataSet.addEntry(pieEntry);
     pieChart.getData().notifyDataChanged();
     pieChart.notifyDataSetChanged();
     pieChart.invalidate();
   }
 
+  /**
+   * Set colors of the chart, not supported!
+   *
+   * @param colors a list of colors (integer values).
+   */
+  //@SimpleFunction(description = "set the color list of the pie chart")
+  public void SetColorList(List<Integer> colors){
+    PieDataSet pieDataSet=new PieDataSet(entries,Title());
+    addColorTemplates(colors);
+    pieDataSet.setColors(colors);
+    pieChart.getData().setDataSet(pieDataSet);
+    pieChart.getData().notifyDataChanged();
+    pieChart.notifyDataSetChanged();
+    pieChart.invalidate();
+  }
   /**
    * Specifies whether the label of entries is shown
    *
@@ -245,5 +255,39 @@ public final class PieChart extends AndroidViewComponent {
       category = PropertyCategory.APPEARANCE)
   public void LabelTextSize(float size) {
     pieChart.setEntryLabelTextSize(size);
+  }
+
+
+  /**
+   * Specifies the pie chart's center hole radius, measured in sp
+   * (scale-independent pixels).
+   *
+   * @param size  font size in sp(scale-independent pixels)
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "")
+  @SimpleProperty(
+      category = PropertyCategory.APPEARANCE)
+  public void CenterHoleRadius(float size) {
+    pieChart.setHoleRadius(size);
+  }
+
+  private void addColorTemplates(List<Integer> colors){
+    if (colors == null)
+      colors=new ArrayList<Integer>();
+    for (int c : ColorTemplate.VORDIPLOM_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.JOYFUL_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.COLORFUL_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.LIBERTY_COLORS)
+        colors.add(c);
+
+    for (int c : ColorTemplate.PASTEL_COLORS)
+        colors.add(c);
   }
 }
