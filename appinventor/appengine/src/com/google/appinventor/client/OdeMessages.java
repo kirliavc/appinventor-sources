@@ -2792,6 +2792,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String EnabledProperties();
 
+  @DefaultMessage("DrawGridBackground")
+  @Description("")
+  String DrawGridBackgroundProperties();
+
   @DefaultMessage("ExtraKey")
   @Description("")
   String ExtraKeyProperties();
@@ -4353,6 +4357,13 @@ public interface OdeMessages extends Messages {
   @Description("")
   String colorsParams();
 
+  @DefaultMessage("index")
+  @Description("")
+  String indexParams();
+
+  @DefaultMessage("position")
+  @Description("")
+  String positionParams();
   //Events
   @DefaultMessage("AccelerationChanged")
   @Description("")
@@ -6472,9 +6483,15 @@ public interface OdeMessages extends Messages {
   @Description("")
   String AddEntryMethods();
 
+  @DefaultMessage("AddDataSet")
+  @Description("")
+  String AddDataSetMethods();
+
   @DefaultMessage("SetColorList")
   @Description("")
   String SetColorListMethods();
+
+
   
   @DefaultMessage("LabelEnabled")
   @Description("")

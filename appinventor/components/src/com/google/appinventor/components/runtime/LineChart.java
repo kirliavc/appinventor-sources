@@ -19,10 +19,10 @@ import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
 
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.components.Legend;
 import android.view.View;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
 
-@DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
+@DesignerComponent(version = YaVersion.LINECHART_COMPONENT_VERSION,
     description = "Line Chart Component",
     category = ComponentCategory.USERINTERFACE,
     nonVisible = false,
@@ -43,10 +43,11 @@ public final class LineChart extends AndroidViewComponent {
 
   // change to reflect the view of the component
   //private final TextView view;
-  private final com.github.mikephil.charting.charts.PieChart pieChart;
+  private final com.github.mikephil.charting.charts.LineChart lineChart;
   private final ComponentContainer container;
   private List<Integer> colors;
-  private ArrayList<PieEntry> entries; 
+  private List<ILineDataSet> dataSets;
+  private List< List<Entry> > entries;
   /**
    * Creates a new component.
    *
@@ -55,43 +56,29 @@ public final class LineChart extends AndroidViewComponent {
   public LineChart(ComponentContainer container) {
     super(container.$form());
     this.container = container;
-    pieChart=new com.github.mikephil.charting.charts.PieChart(container.$context());
+    lineChart=new com.github.mikephil.charting.charts.LineChart(container.$context());
     container.$add(this);
     
-    //view = new TextView(container.$context());
-
-    // Adds the component to its designated container
     
-    PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
     colors = new ArrayList<Integer>();
-    entries = new ArrayList<PieEntry>();
+    entries = new ArrayList< List<Entry> >();
     addColorTemplates(colors);
-    pieDataSet.setColors(colors);
-    PieData pieData=new PieData();
-    pieData.setDataSet(pieDataSet);
-    pieData.setValueTextSize(11f);
-    pieData.setValueTextColor(Color.WHITE);
-    /*
-    IPieDataSet ipds=pieData.getDataSet();
-    ipds.addEntry(new PieEntry((float) ((Math.random() * 1) + 1 / 5),
-            (float)(ipds.getEntryCount()))
-    );
     
+    // initialize an empty lineDataSets arraylist.
+    dataSets = new ArrayList<ILineDataSet>();
+    LineData lineData=new LineData(dataSets);
+    lineData.setValueTextSize(11f);
+    lineData.setValueTextColor(Color.BLACK);
 
-    
-    pieData.setDataSet(ipds);
-    */
-    pieChart.setData(pieData);
-    pieChart.setDrawHoleEnabled(false);
-    pieChart.invalidate();
-    pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
-    Toast.makeText(container.$context(), Title(), Toast.LENGTH_SHORT).show();
+    lineChart.setData(lineData);
+    lineChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+    lineChart.invalidate();
     // Default property values
   }
 
   @Override
   public View getView() {
-    return pieChart;
+    return lineChart;
   }
 
   /*
@@ -105,76 +92,70 @@ public final class LineChart extends AndroidViewComponent {
   @SimpleProperty
   public String Title()
   {
-    //return "";
-    return pieChart.getData().getDataSet().getLabel();
+    return "";
   }
   /**
    * Specifies the title of chart
-   *
+   * NO API PROVIDED. Don't do anything now.
+   * probably delete later.
    * @param text  title of the chart
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
       defaultValue = "")
   @SimpleProperty
   public void Title(String text) {
-    pieChart.getData().getDataSet().setLabel(text);
+    
   }
 
+  /**
+   * Add an empty dataset to the line chart
+   * @param label label of the dataset
+   */
+  @SimpleFunction(description = "Add an empty dataset to chart")
+  public void AddDataSet(String label){
+    List<Entry> dataset=new ArrayList<Entry>();
+    entries.add(dataset);
+    lineChart.getData().addDataSet(new LineDataSet(dataset,label));
+    lineChart.invalidate();
+  }
   /**
    * Add an entry to the chart
    *
-   * @param value value of the entry
-   * @param label label text of the entry
+   * @param index the index of dataset
+   * @param xVal the x value of point
+   * @param yVal the y value of point
    */
   @SimpleFunction(description = "Add an entry to the chart")
-  public void AddEntry(float value,String label){
-    IPieDataSet iPieDataSet = pieChart.getData().getDataSet();
-    PieEntry pieEntry=new PieEntry(value,label);
-    entries.add(pieEntry);
-    iPieDataSet.addEntry(pieEntry);
-    pieChart.getData().notifyDataChanged();
-    pieChart.notifyDataSetChanged();
-    pieChart.invalidate();
+  public void AddEntry(int index, float xVal, float yVal){
+    entries.get(index).add(new Entry(xVal,yVal));
+    lineChart.getData().addEntry(new Entry(xVal,yVal),index);
+    lineChart.getData().notifyDataChanged();
+    lineChart.notifyDataSetChanged();
+    lineChart.invalidate();
   }
 
   /**
-   * Set colors of the chart, not supported!
+   * Set colors of the chart
    *
    * @param colors a list of colors (integer values).
    */
-  //@SimpleFunction(description = "set the color list of the pie chart")
+  @SimpleFunction(description = "set the color list of the line chart")
   public void SetColorList(List<Integer> colors){
-    PieDataSet pieDataSet=new PieDataSet(entries,Title());
-    addColorTemplates(colors);
-    pieDataSet.setColors(colors);
-    pieChart.getData().setDataSet(pieDataSet);
-    pieChart.getData().notifyDataChanged();
-    pieChart.notifyDataSetChanged();
-    pieChart.invalidate();
+    ArrayList<ILineDataSet> newDataSets = new ArrayList<ILineDataSet>();
+    
+    for(int i=0;i<entries.size();i++){
+        List<Entry> dataset = entries.get(i);
+        String label=dataSets.get(i).getLabel();
+        newDataSets.add(new LineDataSet(dataset,label));
+    }
+    LineData lineData=new LineData(newDataSets);
+    lineData.setValueTextSize(11f);
+    lineData.setValueTextColor(Color.BLACK);
+    lineChart.setData(lineData);
+    lineChart.invalidate();
+    dataSets=newDataSets;
   }
-  /**
-   * Specifies whether the label of entries is shown
-   *
-   * @param enable a boolean value 
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public void LabelEnabled(boolean enabled) {
-    pieChart.setDrawEntryLabels(enabled);
-    pieChart.invalidate();
-  }
-  /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public boolean LabelEnabled() {
-    return pieChart.isDrawEntryLabelsEnabled();
-  }
+
 
   /**
    * Specifies whether the legend is shown
@@ -185,22 +166,23 @@ public final class LineChart extends AndroidViewComponent {
       defaultValue = "True")
   @SimpleProperty
   public void LegendEnabled(boolean enabled) {
-    Legend legend=pieChart.getLegend();
+    Legend legend=lineChart.getLegend();
     legend.setEnabled(enabled);
-    pieChart.invalidate();
+    lineChart.invalidate();
   }
+
+
   /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
+   * If enabled, the background rectangle behind the chart
+   * drawing-area will be drawn.
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
   @SimpleProperty
-  public boolean LegendEnabled() {
-    return pieChart.getLegend().isEnabled();
+  public void DrawGridBackground(boolean enabled) {
+    lineChart.setDrawGridBackground(enabled);
+    lineChart.invalidate();
   }
-
   
 
   /**
@@ -213,21 +195,10 @@ public final class LineChart extends AndroidViewComponent {
       defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
   @SimpleProperty
   public void ValueTextColor(int argb) {
-    pieChart.getData().setValueTextColor(argb);
+    lineChart.getData().setValueTextColor(argb);
   }
 
-  /**
-   * Specifies the label's text color of the chart as an 
-   * alpha-red-green-blue integer.
-   *
-   * @param argb  text RGB color with alpha
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-      defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
-  public void LabelTextColor(int argb) {
-    pieChart.setEntryLabelColor(argb);
-  }
+
 
   /**
    * Specifies the value text's size, measured in sp
@@ -240,37 +211,10 @@ public final class LineChart extends AndroidViewComponent {
   @SimpleProperty(
       category = PropertyCategory.APPEARANCE)
   public void ValueTextSize(float size) {
-    pieChart.getData().setValueTextSize(size);
-  }
-
-  /**
-   * Specifies the label text's size, measured in sp
-   * (scale-independent pixels).
-   *
-   * @param size  font size in sp(scale-independent pixels)
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-      defaultValue = Component.FONT_DEFAULT_SIZE + "")
-  @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
-  public void LabelTextSize(float size) {
-    pieChart.setEntryLabelTextSize(size);
+    lineChart.getData().setValueTextSize(size);
   }
 
 
-  /**
-   * Specifies the pie chart's center hole radius, measured in sp
-   * (scale-independent pixels).
-   *
-   * @param size  font size in sp(scale-independent pixels)
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-      defaultValue = Component.FONT_DEFAULT_SIZE + "")
-  @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
-  public void CenterHoleRadius(float size) {
-    pieChart.setHoleRadius(size);
-  }
 
   private void addColorTemplates(List<Integer> colors){
     if (colors == null)
