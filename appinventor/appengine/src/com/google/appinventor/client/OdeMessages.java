@@ -4364,6 +4364,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("position")
   @Description("")
   String positionParams();
+
+  @DefaultMessage("xVal")
+  @Description("")
+  String xValParams();
+
+  @DefaultMessage("yVal")
+  @Description("")
+  String yValParams();
   //Events
   @DefaultMessage("AccelerationChanged")
   @Description("")
@@ -6491,6 +6499,14 @@ public interface OdeMessages extends Messages {
   @Description("")
   String SetColorListMethods();
 
+  @DefaultMessage("removeEntry")
+  @Description("")
+  String removeEntryMethods();
+
+  @DefaultMessage("removeAllData")
+  @Description("")
+  String removeAllDataMethods();
+
 
   
   @DefaultMessage("LabelEnabled")
@@ -6520,5 +6536,17 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("CenterHoleRadius")
   @Description("")
   String CenterHoleRadiusProperties();
+
+  @DefaultMessage("DrawAxisLine")
+  @Description("")
+  String DrawAxisLineProperties();
+
+  @DefaultMessage("Size")
+  @Description("")
+  String sizeParams();
+
+  @DefaultMessage("SetFontSize")
+  @Description("")
+  String SetFontSizeMethods();
 }
 

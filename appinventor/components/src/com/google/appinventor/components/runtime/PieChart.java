@@ -63,10 +63,10 @@ public final class PieChart extends AndroidViewComponent {
     //view = new TextView(container.$context());
 
     // Adds the component to its designated container
-    
-    PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
     colors = new ArrayList<Integer>();
     entries = new ArrayList<PieEntry>();
+    PieDataSet pieDataSet=new PieDataSet(entries,"");
+    
     addColorTemplates(colors);
     pieDataSet.setColors(colors);
     PieData pieData=new PieData();
@@ -131,13 +131,28 @@ public final class PieChart extends AndroidViewComponent {
   @SimpleFunction(description = "Add an entry to the chart")
   public void AddEntry(float value,String label){
     PieEntry pieEntry=new PieEntry(value,label);
-    entries.add(pieEntry);
-    //iPieDataSet.addEntry(pieEntry);
+    //entries.add(pieEntry);
+    pieChart.getData().getDataSet().addEntry(pieEntry);
     pieChart.getData().notifyDataChanged();
     pieChart.notifyDataSetChanged();
     pieChart.invalidate();
   }
-
+  @SimpleFunction(description = "remove one entry specified by index")
+  public void removeEntry(int index){
+    if(!pieChart.getData().getDataSet().removeEntry(index))
+        Toast.makeText(container.$context(), "Failed to remove entry!", Toast.LENGTH_SHORT).show();
+    pieChart.getData().notifyDataChanged();
+    pieChart.notifyDataSetChanged();
+    pieChart.invalidate();
+  }
+  
+  @SimpleFunction(description = "remove all data from the chart")
+  public void removeAllData(){
+    entries.clear();
+    pieChart.getData().notifyDataChanged();
+    pieChart.notifyDataSetChanged();
+    pieChart.invalidate();
+  }
   /**
    * Set colors of the chart
    *

@@ -25,6 +25,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public final class LineChart extends AndroidViewComponent {
   private List<Integer> colors;
   private List<ILineDataSet> dataSets;
   private List< List<Entry> > entries;
+  private float fontSize;
   /**
    * Creates a new component.
    *
@@ -72,6 +74,8 @@ public final class LineChart extends AndroidViewComponent {
 
     lineChart.setData(lineData);
     lineChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+    lineChart.getDescription().setEnabled(false);
+    lineChart.setDrawBorders(false);
     lineChart.invalidate();
     // Default property values
   }
@@ -85,28 +89,28 @@ public final class LineChart extends AndroidViewComponent {
    * return the title of chart
    * @return the title of chart
    * 
-   */
+   
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
   defaultValue = ""
   ) 
   @SimpleProperty
-  public String Title()
+  public String DescriptionText()
   {
-    return "";
+    return lineChart.getDescription().getText();
   }
   /**
    * Specifies the title of chart
    * NO API PROVIDED. Don't do anything now.
    * probably delete later.
    * @param text  title of the chart
-   */
+   
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
       defaultValue = "")
   @SimpleProperty
   public void Title(String text) {
-    
+    lineChart.getDescription().setText(text);
   }
-
+  */
   /**
    * Add an empty dataset to the line chart
    * @param label label of the dataset
@@ -139,22 +143,22 @@ public final class LineChart extends AndroidViewComponent {
    *
    * @param colors a list of colors (integer values).
    */
-  @SimpleFunction(description = "set the color list of the line chart")
   public void SetColorList(List<Integer> colors){
     ArrayList<ILineDataSet> newDataSets = new ArrayList<ILineDataSet>();
-    
+
     for(int i=0;i<entries.size();i++){
-        List<Entry> dataset = entries.get(i);
-        String label=dataSets.get(i).getLabel();
-        newDataSets.add(new LineDataSet(dataset,label));
+      List<Entry> dataset = entries.get(i);
+      String label=dataSets.get(i).getLabel();
+      LineDataSet lineDataSet=new LineDataSet(dataset,label);
+      lineDataSet.setColor(colors.get(i));
+      newDataSets.add(lineDataSet);
     }
     LineData lineData=new LineData(newDataSets);
-    lineData.setValueTextSize(11f);
-    lineData.setValueTextColor(Color.BLACK);
     lineChart.setData(lineData);
     lineChart.invalidate();
     dataSets=newDataSets;
-  }
+    SetFontSize(fontSize);
+    }
 
 
   /**
@@ -183,8 +187,39 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.setDrawGridBackground(enabled);
     lineChart.invalidate();
   }
-  
 
+  /**
+   * If enabled, axis grid lines will be drawn
+   * 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty
+  public void DrawAxisLine(boolean enabled) {
+    XAxis xaxis=lineChart.getXAxis();
+    xaxis.setDrawGridLines(enabled);
+    lineChart.invalidate();
+  }
+
+  /**
+   * Set the font size of every text in the chart
+   *
+   * @param size font size
+   */
+  @SimpleFunction(description = "set size of text in the chart")
+  public void SetFontSize(float size){
+    fontSize=size;
+    Legend legend=lineChart.getLegend();
+    legend.setTextSize(size);
+    lineChart.getXAxis().setTextSize(size);
+    lineChart.getAxisLeft().setTextSize(size);
+    lineChart.getAxisRight().setTextSize(size);
+    for(ILineDataSet lineDataSet : lineChart.getData().getDataSets()){
+      lineDataSet.setValueTextSize(size);
+    }
+    lineChart.notifyDataSetChanged();
+    lineChart.invalidate();
+  }
   /**
    * Specifies the value's text color of the chart as an 
    * alpha-red-green-blue integer.
