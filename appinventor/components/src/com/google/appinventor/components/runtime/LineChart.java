@@ -22,10 +22,12 @@ import com.google.appinventor.components.runtime.util.TextViewUtil;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -143,6 +145,7 @@ public final class LineChart extends AndroidViewComponent {
    *
    * @param colors a list of colors (integer values).
    */
+  @SimpleFunction(description = "set colors of each dataset in the chart")
   public void SetColorList(List<Integer> colors){
     ArrayList<ILineDataSet> newDataSets = new ArrayList<ILineDataSet>();
 
@@ -158,9 +161,25 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.invalidate();
     dataSets=newDataSets;
     SetFontSize(fontSize);
-    }
+  }
 
+  /**
+   * Set x axis text of each value in the chart
+   *
+   * @param values a list of string
+   */
+  @SimpleFunction(description = "set the x axis text of each integer value in the chart(0,1,2...)")
+  public void SetXAxisValues(final List<String> values){
+    IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
+      @Override
+      public String getFormattedValue(float value, AxisBase axis) {
+        return values.get((int)value);
+      }
+    };
+    lineChart.getXAxis().setValueFormatter(formatter);
+    lineChart.getXAxis().setGranularity(1f);
+  }
   /**
    * Specifies whether the legend is shown
    *

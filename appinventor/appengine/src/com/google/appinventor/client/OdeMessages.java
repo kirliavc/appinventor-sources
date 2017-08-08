@@ -6548,5 +6548,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("SetFontSize")
   @Description("")
   String SetFontSizeMethods();
+
+
+  @DefaultMessage("SetXAxisValues")
+  @Description("")
+  String SetXAxisValuesMethods();
 }
 
