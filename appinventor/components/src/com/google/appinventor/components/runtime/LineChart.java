@@ -33,6 +33,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
+import com.google.appinventor.components.runtime.util.YailList;
+
+import gnu.mapping.Symbol;
 
 @DesignerComponent(version = YaVersion.LINECHART_COMPONENT_VERSION,
     description = "Line Chart Component",
@@ -71,13 +74,12 @@ public final class LineChart extends AndroidViewComponent {
     // initialize an empty lineDataSets arraylist.
     dataSets = new ArrayList<ILineDataSet>();
     LineData lineData=new LineData(dataSets);
-    lineData.setValueTextSize(11f);
-    lineData.setValueTextColor(Color.BLACK);
 
     lineChart.setData(lineData);
     lineChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
     lineChart.getDescription().setEnabled(false);
     lineChart.setDrawBorders(false);
+    lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
     lineChart.invalidate();
     // Default property values
   }
@@ -87,32 +89,8 @@ public final class LineChart extends AndroidViewComponent {
     return lineChart;
   }
 
-  /*
-   * return the title of chart
-   * @return the title of chart
-   * 
-   
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-  defaultValue = ""
-  ) 
-  @SimpleProperty
-  public String DescriptionText()
-  {
-    return lineChart.getDescription().getText();
-  }
-  /**
-   * Specifies the title of chart
-   * NO API PROVIDED. Don't do anything now.
-   * probably delete later.
-   * @param text  title of the chart
-   
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-      defaultValue = "")
-  @SimpleProperty
-  public void Title(String text) {
-    lineChart.getDescription().setText(text);
-  }
-  */
+  
+  
   /**
    * Add an empty dataset to the line chart
    * @param label label of the dataset
@@ -146,14 +124,15 @@ public final class LineChart extends AndroidViewComponent {
    * @param colors a list of colors (integer values).
    */
   @SimpleFunction(description = "set colors of each dataset in the chart")
-  public void SetColorList(List<Integer> colors){
+  public void SetColorList(YailList colors){
+    Object[] list=colors.toArray();
     ArrayList<ILineDataSet> newDataSets = new ArrayList<ILineDataSet>();
 
     for(int i=0;i<entries.size();i++){
       List<Entry> dataset = entries.get(i);
       String label=dataSets.get(i).getLabel();
       LineDataSet lineDataSet=new LineDataSet(dataset,label);
-      lineDataSet.setColor(colors.get(i));
+      lineDataSet.setColor(gnu.math.IntNum.intValue(list[i]));
       newDataSets.add(lineDataSet);
     }
     LineData lineData=new LineData(newDataSets);
@@ -169,16 +148,26 @@ public final class LineChart extends AndroidViewComponent {
    * @param values a list of string
    */
   @SimpleFunction(description = "set the x axis text of each integer value in the chart(0,1,2...)")
-  public void SetXAxisValues(final List<String> values){
+  public void SetXAxisValues(YailList list){
+    //Toast.makeText(container.$context(), values.get(1), Toast.LENGTH_SHORT).show();
+    final List<String> labels=new ArrayList<String>();
+    for(Object obj : list.toArray()){
+      labels.add(obj.toString());
+    }
     IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
       @Override
       public String getFormattedValue(float value, AxisBase axis) {
-        return values.get((int)value);
+        //return values.get(0).toString();
+        if(value>=0&&labels.size()>(int)value&&labels.get((int)value)!=null)
+          return labels.get((int)value).toString();
+        else
+          return String.valueOf(value);
       }
     };
     lineChart.getXAxis().setValueFormatter(formatter);
     lineChart.getXAxis().setGranularity(1f);
+    
   }
   /**
    * Specifies whether the legend is shown
@@ -187,21 +176,58 @@ public final class LineChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void LegendEnabled(boolean enabled) {
     Legend legend=lineChart.getLegend();
     legend.setEnabled(enabled);
     lineChart.invalidate();
   }
 
+  /**
+   * Specifies whether the value of each entry is shown in the chart
+   *
+   * @param enable a boolean value 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void DisplayValue(boolean enabled) {
+    for(ILineDataSet dataset : lineChart.getData().getDataSets()){
+      dataset.setDrawValues(enabled);
+    }
+  }
+
+  /**
+   * Specifies whether the chart can be scaled
+   *
+   * @param enable a boolean value 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void ScaleEnabled(boolean enabled) {
+    lineChart.setScaleEnabled(enabled);
+  }
+
+  /**
+   * Specifies whether the chart can be dragged (on x and y axis)
+   *
+   * @param enable a boolean value 
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void DragEnabled(boolean enabled) {
+    lineChart.setDragEnabled(enabled);
+  }
 
   /**
    * If enabled, the background rectangle behind the chart
    * drawing-area will be drawn.
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
+      defaultValue = "False")
+  @SimpleProperty(userVisible=false)
   public void DrawGridBackground(boolean enabled) {
     lineChart.setDrawGridBackground(enabled);
     lineChart.invalidate();
@@ -213,7 +239,7 @@ public final class LineChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void DrawAxisLine(boolean enabled) {
     XAxis xaxis=lineChart.getXAxis();
     xaxis.setDrawGridLines(enabled);

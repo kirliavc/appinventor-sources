@@ -87,7 +87,7 @@ public final class PieChart extends AndroidViewComponent {
     pieChart.setDrawHoleEnabled(false);
     pieChart.invalidate();
     pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
-    Toast.makeText(container.$context(), Title(), Toast.LENGTH_SHORT).show();
+    
     // Default property values
   }
 
@@ -184,17 +184,6 @@ public final class PieChart extends AndroidViewComponent {
   public void LabelEnabled(boolean enabled) {
     pieChart.setDrawEntryLabels(enabled);
     pieChart.invalidate();
-  }
-  /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public boolean LabelEnabled() {
-    return pieChart.isDrawEntryLabelsEnabled();
   }
 
   /**

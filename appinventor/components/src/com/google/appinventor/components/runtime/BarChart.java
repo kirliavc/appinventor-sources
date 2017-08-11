@@ -19,18 +19,22 @@ import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
 
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.components.AxisBase;
 import android.view.View;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
-
+import com.google.appinventor.components.runtime.util.YailList;
+import gnu.mapping.Symbol;
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
     description = "BarChart Component",
     category = ComponentCategory.USERINTERFACE,
@@ -43,10 +47,11 @@ public final class BarChart extends AndroidViewComponent {
 
   // change to reflect the view of the component
   //private final TextView view;
-  private final com.github.mikephil.charting.charts.PieChart pieChart;
+  private final com.github.mikephil.charting.charts.BarChart barChart;
   private final ComponentContainer container;
-  private List<Integer> colors;
-  private ArrayList<PieEntry> entries; 
+  private List<Integer> colors=new ArrayList<Integer>();
+  private List< List<BarEntry> > entries;
+  private float fontSize;
   /**
    * Creates a new component.
    *
@@ -55,71 +60,23 @@ public final class BarChart extends AndroidViewComponent {
   public BarChart(ComponentContainer container) {
     super(container.$form());
     this.container = container;
-    pieChart=new com.github.mikephil.charting.charts.PieChart(container.$context());
+    barChart=new com.github.mikephil.charting.charts.BarChart(container.$context());
     container.$add(this);
     
-    //view = new TextView(container.$context());
-
-    // Adds the component to its designated container
-    
-    PieDataSet pieDataSet=new PieDataSet(new ArrayList<PieEntry>(),"");
-    colors = new ArrayList<Integer>();
-    entries = new ArrayList<PieEntry>();
-    addColorTemplates(colors);
-    pieDataSet.setColors(colors);
-    PieData pieData=new PieData();
-    pieData.setDataSet(pieDataSet);
-    pieData.setValueTextSize(11f);
-    pieData.setValueTextColor(Color.WHITE);
-    /*
-    IPieDataSet ipds=pieData.getDataSet();
-    ipds.addEntry(new PieEntry((float) ((Math.random() * 1) + 1 / 5),
-            (float)(ipds.getEntryCount()))
-    );
-    
-
-    
-    pieData.setDataSet(ipds);
-    */
-    pieChart.setData(pieData);
-    pieChart.setDrawHoleEnabled(false);
-    pieChart.invalidate();
-    pieChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
-    Toast.makeText(container.$context(), Title(), Toast.LENGTH_SHORT).show();
-    // Default property values
+    BarData barData=new BarData();
+    barChart.setData(barData);
+    barChart.setFitBars(true);
+    barChart.getDescription().setEnabled(false);
+    barChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+    barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+    barChart.getXAxis().setCenterAxisLabels(true);
+    barChart.invalidate();
   }
 
   @Override
   public View getView() {
-    return pieChart;
+    return barChart;
   }
-
-  /*
-   * return the title of chart
-   * @return the title of chart
-   * 
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-  defaultValue = ""
-  ) 
-  @SimpleProperty
-  public String Title()
-  {
-    //return "";
-    return pieChart.getData().getDataSet().getLabel();
-  }
-  /**
-   * Specifies the title of chart
-   *
-   * @param text  title of the chart
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-      defaultValue = "")
-  @SimpleProperty
-  public void Title(String text) {
-    pieChart.getData().getDataSet().setLabel(text);
-  }
-
   /**
    * Add an entry to the chart
    *
@@ -127,55 +84,113 @@ public final class BarChart extends AndroidViewComponent {
    * @param label label text of the entry
    */
   @SimpleFunction(description = "Add an entry to the chart")
-  public void AddEntry(float value,String label){
-    IPieDataSet iPieDataSet = pieChart.getData().getDataSet();
-    PieEntry pieEntry=new PieEntry(value,label);
-    entries.add(pieEntry);
-    iPieDataSet.addEntry(pieEntry);
-    pieChart.getData().notifyDataChanged();
-    pieChart.notifyDataSetChanged();
-    pieChart.invalidate();
+  public void AddEntry(int index, float yVal){
+    List<BarEntry> list=entries.get(index);
+    list.add(new BarEntry(list.size(),yVal));
+    barChart.getData().notifyDataChanged();
+    barChart.notifyDataSetChanged();
+    barChart.invalidate();
   }
+
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void DrawVerticalAxisLine(boolean enabled) {
+    XAxis xaxis=barChart.getXAxis();
+    xaxis.setDrawGridLines(enabled);
+    barChart.invalidate();
+  }
+
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void DrawHorizontalAxisLine(boolean enabled) {
+    barChart.getAxisLeft().setDrawGridLines(enabled);
+    barChart.getAxisRight().setDrawGridLines(enabled);
+    barChart.invalidate();
+  }
+
 
   /**
    * Set colors of the chart, not supported!
    *
    * @param colors a list of colors (integer values).
    */
-  //@SimpleFunction(description = "set the color list of the pie chart")
-  public void SetColorList(List<Integer> colors){
-    PieDataSet pieDataSet=new PieDataSet(entries,Title());
-    addColorTemplates(colors);
-    pieDataSet.setColors(colors);
-    pieChart.getData().setDataSet(pieDataSet);
-    pieChart.getData().notifyDataChanged();
-    pieChart.notifyDataSetChanged();
-    pieChart.invalidate();
+  @SimpleFunction(description = "set the color list of the bar chart")
+  public void SetColorList(YailList colors){
+    Object[] list=colors.toArray();
+    ArrayList<IBarDataSet> newDataSets = new ArrayList<IBarDataSet>();
+
+    for(int i=0;i<entries.size();i++){
+      List<BarEntry> dataset = entries.get(i);
+      String label=barChart.getData().getDataSets().get(i).getLabel();
+      BarDataSet barDataSet=new BarDataSet(dataset,label);
+      barDataSet.setColor(gnu.math.IntNum.intValue(list[i]));
+      newDataSets.add(barDataSet);
+    }
+    BarData barData=new BarData(newDataSets);
+    //lineData.setValueTextSize(11f);
+    barChart.setData(barData);
+    barChart.invalidate();
+
+    
+    adjust();
+  }
+  /*
+  **
+   * Set x axis text of each value in the chart
+   *
+   * @param values a list of string
+   */
+  @SimpleFunction(description = "set the x axis text of each integer value in the chart(0,1,2...)")
+  public void SetXAxisValues(YailList list){
+    final List<String> labels=new ArrayList<String>();
+    for(Object obj : list.toArray()){
+      labels.add(obj.toString());
+    }
+    IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+      @Override
+      public String getFormattedValue(float value, AxisBase axis) {
+        if(value>=0&&labels.size()>(int)value&&labels.get((int)value)!=null)
+          return labels.get((int)value).toString();
+        else
+          return String.valueOf(value);
+      }
+    };
+    barChart.getXAxis().setValueFormatter(formatter);
+    barChart.getXAxis().setGranularity(1f);
+    
   }
   /**
-   * Specifies whether the label of entries is shown
+   * Specifies whether the value number of entries is shown
    *
    * @param enable a boolean value 
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
-  public void LabelEnabled(boolean enabled) {
-    pieChart.setDrawEntryLabels(enabled);
-    pieChart.invalidate();
-  }
-  /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public boolean LabelEnabled() {
-    return pieChart.isDrawEntryLabelsEnabled();
+  @SimpleProperty(userVisible=false)
+  public void DisplayValue(boolean enabled) {
+    barChart.getData().setDrawValues(enabled);
+    barChart.invalidate();
   }
 
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "11f")
+  @SimpleProperty(userVisible=false)
+  public void FontSize(float size){
+    fontSize=size;
+    Legend legend=barChart.getLegend();
+    legend.setTextSize(size);
+    barChart.getXAxis().setTextSize(size);
+    barChart.getAxisLeft().setTextSize(size);
+    barChart.getAxisRight().setTextSize(size);
+    for(IBarDataSet dataSet : barChart.getData().getDataSets()){
+      dataSet.setValueTextSize(size);
+    }
+    barChart.notifyDataSetChanged();
+    barChart.invalidate();
+  }
   /**
    * Specifies whether the legend is shown
    *
@@ -183,23 +198,13 @@ public final class BarChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void LegendEnabled(boolean enabled) {
-    Legend legend=pieChart.getLegend();
+    Legend legend=barChart.getLegend();
     legend.setEnabled(enabled);
-    pieChart.invalidate();
+    barChart.invalidate();
   }
-  /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public boolean LegendEnabled() {
-    return pieChart.getLegend().isEnabled();
-  }
+  
 
   
 
@@ -211,66 +216,15 @@ public final class BarChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
       defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void ValueTextColor(int argb) {
-    pieChart.getData().setValueTextColor(argb);
-  }
-
-  /**
-   * Specifies the label's text color of the chart as an 
-   * alpha-red-green-blue integer.
-   *
-   * @param argb  text RGB color with alpha
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-      defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
-  public void LabelTextColor(int argb) {
-    pieChart.setEntryLabelColor(argb);
-  }
-
-  /**
-   * Specifies the value text's size, measured in sp
-   * (scale-independent pixels).
-   *
-   * @param size  font size in sp(scale-independent pixels)
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-      defaultValue = Component.FONT_DEFAULT_SIZE + "")
-  @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
-  public void ValueTextSize(float size) {
-    pieChart.getData().setValueTextSize(size);
-  }
-
-  /**
-   * Specifies the label text's size, measured in sp
-   * (scale-independent pixels).
-   *
-   * @param size  font size in sp(scale-independent pixels)
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-      defaultValue = Component.FONT_DEFAULT_SIZE + "")
-  @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
-  public void LabelTextSize(float size) {
-    pieChart.setEntryLabelTextSize(size);
+    barChart.getData().setValueTextColor(argb);
   }
 
 
-  /**
-   * Specifies the pie chart's center hole radius, measured in sp
-   * (scale-independent pixels).
-   *
-   * @param size  font size in sp(scale-independent pixels)
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-      defaultValue = Component.FONT_DEFAULT_SIZE + "")
-  @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
-  public void CenterHoleRadius(float size) {
-    pieChart.setHoleRadius(size);
-  }
+
+
+
 
   private void addColorTemplates(List<Integer> colors){
     if (colors == null)
@@ -289,5 +243,17 @@ public final class BarChart extends AndroidViewComponent {
 
     for (int c : ColorTemplate.PASTEL_COLORS)
         colors.add(c);
+  }
+
+  private void adjust(){
+    float groupSpace=0.15f;
+    float barSpace=(1-groupSpace)/entries.size()/10;
+    float barWidth=barSpace*9;
+    if(entries.size()>=2){
+      barChart.getBarData().setBarWidth(barWidth);
+      barChart.groupBars(0f,groupSpace,barSpace);
+      barChart.invalidate();
+    }
+    FontSize(fontSize);
   }
 }

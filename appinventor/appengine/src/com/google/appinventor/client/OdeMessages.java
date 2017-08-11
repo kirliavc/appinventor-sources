@@ -6510,36 +6510,59 @@ public interface OdeMessages extends Messages {
 
   
   @DefaultMessage("LabelEnabled")
-  @Description("")
+  @Description("set true if label should be drawn")
   String LabelEnabledProperties();
 
   @DefaultMessage("LegendEnabled")
-  @Description("")
+  @Description("set true if the legend should be drawn")
   String LegendEnabledProperties();
 
   @DefaultMessage("ValueTextColor")
-  @Description("")
+  @Description("set the color of value text in the chart")
   String ValueTextColorProperties();
 
   @DefaultMessage("LabelTextColor")
-  @Description("")
+  @Description("set the color of label text in the chart")
   String LabelTextColorProperties();
 
   @DefaultMessage("ValueTextSize")
-  @Description("")
+  @Description("set the text size of values in the chart")
   String ValueTextSizeProperties();
 
+  @DefaultMessage("DragEnabled")
+  @Description("set whether the chart can be dragged")
+  String DragEnabledProperties();
+
+  @DefaultMessage("ScaleEnabled")
+  @Description("set whether the chart can be scaled")
+  String ScaleEnabledProperties();
+
+
   @DefaultMessage("LabelTextSize")
-  @Description("")
+  @Description("set the label text size")
   String LabelTextSizeProperties();
 
   @DefaultMessage("CenterHoleRadius")
-  @Description("")
+  @Description("set center hole radius of pie chart")
   String CenterHoleRadiusProperties();
 
   @DefaultMessage("DrawAxisLine")
-  @Description("")
+  @Description("set true if x axis lines should be drawn")
   String DrawAxisLineProperties();
+
+  @DefaultMessage("DrawVerticalAxisLine")
+  @Description("set true if vertical lines should be drawn")
+  String DrawVerticalAxisLineProperties();
+
+  @DefaultMessage("DrawHorizontalAxisLine")
+  @Description("set true if horizontal axis lines should be drawn")
+  String DrawHorizontalAxisLineProperties();
+
+  @DefaultMessage("DisplayValue")
+  @Description("set true if value text is shown on the top of each data")
+  String DisplayValueProperties();
+
+
 
   @DefaultMessage("Size")
   @Description("")
