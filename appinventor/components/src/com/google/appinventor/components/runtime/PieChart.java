@@ -131,7 +131,6 @@ public final class PieChart extends AndroidViewComponent {
   @SimpleFunction(description = "Add an entry to the chart")
   public void AddEntry(float value,String label){
     PieEntry pieEntry=new PieEntry(value,label);
-    //entries.add(pieEntry);
     pieChart.getData().getDataSet().addEntry(pieEntry);
     pieChart.getData().notifyDataChanged();
     pieChart.notifyDataSetChanged();

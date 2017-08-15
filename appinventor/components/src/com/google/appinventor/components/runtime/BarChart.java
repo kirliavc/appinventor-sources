@@ -51,7 +51,7 @@ public final class BarChart extends AndroidViewComponent {
   private final ComponentContainer container;
   private List<Integer> colors=new ArrayList<Integer>();
   private List< List<BarEntry> > entries;
-  private float fontSize;
+  private float fontSize=11f;
   /**
    * Creates a new component.
    *
@@ -62,6 +62,9 @@ public final class BarChart extends AndroidViewComponent {
     this.container = container;
     barChart=new com.github.mikephil.charting.charts.BarChart(container.$context());
     container.$add(this);
+
+    entries = new ArrayList< List<BarEntry> >();
+    addColorTemplates(colors);
     
     BarData barData=new BarData();
     barChart.setData(barData);
@@ -77,16 +80,34 @@ public final class BarChart extends AndroidViewComponent {
   public View getView() {
     return barChart;
   }
+
+  /**
+   * Add a dataset to the chart
+   *
+   * @param label label text of the dataset
+   */
+  @SimpleFunction(description = "Add a dataset to the bar chart")
+  public void AddDataSet(String label){
+    List<BarEntry> entryList=new ArrayList<BarEntry>();
+    entries.add(entryList);
+    BarDataSet dataSet=new BarDataSet(entryList,label);
+    barChart.getData().addDataSet(dataSet);
+    barChart.notifyDataSetChanged();
+    adjust();
+  }
+
   /**
    * Add an entry to the chart
    *
-   * @param value value of the entry
-   * @param label label text of the entry
+   * @param index the index of datasets
+   * @param yVal the value of this entry
    */
   @SimpleFunction(description = "Add an entry to the chart")
   public void AddEntry(int index, float yVal){
     List<BarEntry> list=entries.get(index);
-    list.add(new BarEntry(list.size(),yVal));
+    BarEntry entry=new BarEntry(list.size()+1,yVal);
+    //list.add(entry);
+    barChart.getData().getDataSetByIndex(index).addEntry(entry);
     barChart.getData().notifyDataChanged();
     barChart.notifyDataSetChanged();
     barChart.invalidate();
@@ -152,6 +173,7 @@ public final class BarChart extends AndroidViewComponent {
 
       @Override
       public String getFormattedValue(float value, AxisBase axis) {
+        //value=value/2;
         if(value>=0&&labels.size()>(int)value&&labels.get((int)value)!=null)
           return labels.get((int)value).toString();
         else
@@ -247,7 +269,7 @@ public final class BarChart extends AndroidViewComponent {
 
   private void adjust(){
     float groupSpace=0.15f;
-    float barSpace=(1-groupSpace)/entries.size()/10;
+    float barSpace=(1f-groupSpace)/entries.size()/10f;
     float barWidth=barSpace*9;
     if(entries.size()>=2){
       barChart.getBarData().setBarWidth(barWidth);

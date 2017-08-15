@@ -54,7 +54,9 @@ public final class LineChart extends AndroidViewComponent {
   private List<Integer> colors;
   private List<ILineDataSet> dataSets;
   private List< List<Entry> > entries;
-  private float fontSize;
+  private float otherSize;
+  private int valueColor;
+  private float valueSize;
   /**
    * Creates a new component.
    *
@@ -81,7 +83,6 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.setDrawBorders(false);
     lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
     lineChart.invalidate();
-    // Default property values
   }
 
   @Override
@@ -99,7 +100,9 @@ public final class LineChart extends AndroidViewComponent {
   public void AddDataSet(String label){
     List<Entry> dataset=new ArrayList<Entry>();
     entries.add(dataset);
-    lineChart.getData().addDataSet(new LineDataSet(dataset,label));
+    LineDataSet lineDataSet=new LineDataSet(dataset,label);
+    lineDataSet.setValueTextColor(valueColor);
+    lineChart.getData().addDataSet(lineDataSet);
     lineChart.invalidate();
   }
   /**
@@ -139,7 +142,9 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.setData(lineData);
     lineChart.invalidate();
     dataSets=newDataSets;
-    SetFontSize(fontSize);
+    ValueTextSize(valueSize);
+    OtherTextSize(otherSize);
+    ValueTextColor(valueColor);
   }
 
   /**
@@ -192,9 +197,8 @@ public final class LineChart extends AndroidViewComponent {
       defaultValue = "True")
   @SimpleProperty(userVisible=false)
   public void DisplayValue(boolean enabled) {
-    for(ILineDataSet dataset : lineChart.getData().getDataSets()){
-      dataset.setDrawValues(enabled);
-    }
+    lineChart.getData().setDrawValues(enabled);
+    lineChart.invalidate();
   }
 
   /**
@@ -232,17 +236,26 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.setDrawGridBackground(enabled);
     lineChart.invalidate();
   }
-
   /**
-   * If enabled, axis grid lines will be drawn
-   * 
+   * If enabled, the vertical axis lines will be drawn
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
   @SimpleProperty(userVisible=false)
-  public void DrawAxisLine(boolean enabled) {
+  public void DrawVerticalAxisLine(boolean enabled) {
     XAxis xaxis=lineChart.getXAxis();
     xaxis.setDrawGridLines(enabled);
+    lineChart.invalidate();
+  }
+  /**
+   * If enabled, the horizontal axis lines will be drawn
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True")
+  @SimpleProperty(userVisible=false)
+  public void DrawHorizontalAxisLine(boolean enabled) {
+    lineChart.getAxisLeft().setDrawGridLines(enabled);
+    lineChart.getAxisRight().setDrawGridLines(enabled);
     lineChart.invalidate();
   }
 
@@ -251,17 +264,16 @@ public final class LineChart extends AndroidViewComponent {
    *
    * @param size font size
    */
-  @SimpleFunction(description = "set size of text in the chart")
-  public void SetFontSize(float size){
-    fontSize=size;
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "")
+  @SimpleProperty(userVisible=false)
+  public void OtherTextSize(float size){
+    otherSize=size;
     Legend legend=lineChart.getLegend();
     legend.setTextSize(size);
     lineChart.getXAxis().setTextSize(size);
     lineChart.getAxisLeft().setTextSize(size);
     lineChart.getAxisRight().setTextSize(size);
-    for(ILineDataSet lineDataSet : lineChart.getData().getDataSets()){
-      lineDataSet.setValueTextSize(size);
-    }
     lineChart.notifyDataSetChanged();
     lineChart.invalidate();
   }
@@ -273,9 +285,11 @@ public final class LineChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
       defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void ValueTextColor(int argb) {
     lineChart.getData().setValueTextColor(argb);
+    valueColor=argb;
+    lineChart.invalidate();
   }
 
 
@@ -289,9 +303,11 @@ public final class LineChart extends AndroidViewComponent {
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
       defaultValue = Component.FONT_DEFAULT_SIZE + "")
   @SimpleProperty(
-      category = PropertyCategory.APPEARANCE)
+      category = PropertyCategory.APPEARANCE,userVisible=false)
   public void ValueTextSize(float size) {
+    valueSize=size;
     lineChart.getData().setValueTextSize(size);
+    lineChart.invalidate();
   }
 
 
