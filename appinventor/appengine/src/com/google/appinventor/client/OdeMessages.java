@@ -2324,6 +2324,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String uninitializedComponentPallette();
 
+  @DefaultMessage("Chart")
+  @Description("")
+  String chartComponentPallette();
+
   // UI Pallette
   @DefaultMessage("Button")
   @Description("")
@@ -6576,5 +6580,13 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("SetXAxisValues")
   @Description("")
   String SetXAxisValuesMethods();
+
+  @DefaultMessage("RemoveDataSet")
+  @Description("")
+  String RemoveDataSetMethods();
+
+  @DefaultMessage("Data")
+  @Description("")
+  String dataParams();
 }
 

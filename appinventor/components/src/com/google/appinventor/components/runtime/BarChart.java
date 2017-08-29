@@ -37,7 +37,7 @@ import com.google.appinventor.components.runtime.util.YailList;
 import gnu.mapping.Symbol;
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
     description = "BarChart Component",
-    category = ComponentCategory.USERINTERFACE,
+    category = ComponentCategory.CHART,
     nonVisible = false,
     iconName = "images/barChart.png")
 @SimpleObject
@@ -72,7 +72,9 @@ public final class BarChart extends AndroidViewComponent {
     barChart.getDescription().setEnabled(false);
     barChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
     barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-    barChart.getXAxis().setCenterAxisLabels(true);
+    
+    barChart.getXAxis().setGranularity(1f);
+    
     barChart.invalidate();
   }
 
@@ -91,6 +93,27 @@ public final class BarChart extends AndroidViewComponent {
     List<BarEntry> entryList=new ArrayList<BarEntry>();
     entries.add(entryList);
     BarDataSet dataSet=new BarDataSet(entryList,label);
+    dataSet.setColor(colors.get(entries.size()-1));
+    barChart.getData().addDataSet(dataSet);
+    barChart.notifyDataSetChanged();
+    adjust();
+  }
+
+  /**
+   * Add a dataset to the chart
+   *
+   * @param label label text of the dataset
+   */
+  @SimpleFunction(description = "Add a dataset and a list of data entries to the bar chart")
+  public void AddDataSet(String label,YailList data){
+    Object[] list=data.toArray();
+    List<BarEntry> entryList=new ArrayList<BarEntry>();
+    for(int i=0;i<list.length;i++){
+      entryList.add(new BarEntry(i,gnu.math.IntNum.intValue(list[i])));
+    }
+    entries.add(entryList);
+    BarDataSet dataSet=new BarDataSet(entryList,label);
+    dataSet.setColor(colors.get(entries.size()-1));
     barChart.getData().addDataSet(dataSet);
     barChart.notifyDataSetChanged();
     adjust();
@@ -103,14 +126,32 @@ public final class BarChart extends AndroidViewComponent {
    * @param yVal the value of this entry
    */
   @SimpleFunction(description = "Add an entry to the chart")
-  public void AddEntry(int index, float yVal){
-    List<BarEntry> list=entries.get(index);
-    BarEntry entry=new BarEntry(list.size()+1,yVal);
+  public void AddEntry(String label, float yVal){
+    IBarDataSet iBarDataSet=barChart.getData().getDataSetByLabel(label,false);
+    if(iBarDataSet==null){
+      Toast.makeText(container.$context(),
+              "Could not add entry: label \'"+label+"\' does not exist."
+              , Toast.LENGTH_SHORT).show();
+      return;
+    }
+    BarEntry entry=new BarEntry(iBarDataSet.getEntryCount(),yVal);
     //list.add(entry);
-    barChart.getData().getDataSetByIndex(index).addEntry(entry);
+    iBarDataSet.addEntry(entry);
     barChart.getData().notifyDataChanged();
     barChart.notifyDataSetChanged();
-    barChart.invalidate();
+    adjust();
+  }
+
+  @SimpleFunction(description = "Remove a data set")
+  public void RemoveDataSet(String label){
+    IBarDataSet iBarDataSet=barChart.getData().getDataSetByLabel(label,false);
+    if(iBarDataSet==null){
+      Toast.makeText(container.$context(),
+              "Could not remove data set: label \'"+label+"\' does not exist."
+              , Toast.LENGTH_SHORT).show();
+      return;
+    }
+    barChart.getData().removeDataSet(iBarDataSet);
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
@@ -142,7 +183,7 @@ public final class BarChart extends AndroidViewComponent {
     Object[] list=colors.toArray();
     ArrayList<IBarDataSet> newDataSets = new ArrayList<IBarDataSet>();
 
-    for(int i=0;i<entries.size();i++){
+    for(int i=0;i<list.length;i++){
       List<BarEntry> dataset = entries.get(i);
       String label=barChart.getData().getDataSets().get(i).getLabel();
       BarDataSet barDataSet=new BarDataSet(dataset,label);
@@ -181,7 +222,7 @@ public final class BarChart extends AndroidViewComponent {
       }
     };
     barChart.getXAxis().setValueFormatter(formatter);
-    barChart.getXAxis().setGranularity(1f);
+    
     
   }
   /**
@@ -274,6 +315,13 @@ public final class BarChart extends AndroidViewComponent {
     if(entries.size()>=2){
       barChart.getBarData().setBarWidth(barWidth);
       barChart.groupBars(0f,groupSpace,barSpace);
+      barChart.getXAxis().setAxisMinimum(0f);
+      int maxEntryCount=0;
+      for(IBarDataSet iBarDataSet:barChart.getData().getDataSets()){
+        maxEntryCount=Math.max(maxEntryCount,iBarDataSet.getEntryCount());
+      }
+      barChart.getXAxis().setAxisMaximum(maxEntryCount);
+      barChart.getXAxis().setCenterAxisLabels(true);
       barChart.invalidate();
     }
     FontSize(fontSize);

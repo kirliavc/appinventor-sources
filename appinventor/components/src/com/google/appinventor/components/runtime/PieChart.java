@@ -35,7 +35,7 @@ import gnu.math.IntNum;
 
 @DesignerComponent(version = YaVersion.PIECHART_COMPONENT_VERSION,
     description = "PieChart Component",
-    category = ComponentCategory.USERINTERFACE,
+    category = ComponentCategory.CHART,
     nonVisible = false,
     iconName = "images/pieChart.png")
 @SimpleObject
@@ -73,16 +73,7 @@ public final class PieChart extends AndroidViewComponent {
     pieData.setDataSet(pieDataSet);
     pieData.setValueTextSize(11f);
     pieData.setValueTextColor(Color.WHITE);
-    /*
-    IPieDataSet ipds=pieData.getDataSet();
-    ipds.addEntry(new PieEntry((float) ((Math.random() * 1) + 1 / 5),
-            (float)(ipds.getEntryCount()))
-    );
-    
 
-    
-    pieData.setDataSet(ipds);
-    */
     pieChart.setData(pieData);
     pieChart.setDrawHoleEnabled(false);
     pieChart.invalidate();
@@ -96,31 +87,6 @@ public final class PieChart extends AndroidViewComponent {
     return pieChart;
   }
 
-  /*
-   * return the title of chart
-   * @return the title of chart
-   * 
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-  defaultValue = ""
-  ) 
-  @SimpleProperty
-  public String Title()
-  {
-    //return "";
-    return pieChart.getData().getDataSet().getLabel();
-  }
-  /**
-   * Specifies the title of chart
-   *
-   * @param text  title of the chart
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-      defaultValue = "")
-  @SimpleProperty
-  public void Title(String text) {
-    pieChart.getData().getDataSet().setLabel(text);
-  }
 
   /**
    * Add an entry to the chart
@@ -137,7 +103,14 @@ public final class PieChart extends AndroidViewComponent {
     pieChart.invalidate();
   }
   @SimpleFunction(description = "remove one entry specified by index")
-  public void removeEntry(int index){
+  public void removeEntry(String label){
+    int index=-1;
+    for(int i=0;i<entries.size();i++){
+      if(entries.get(i).getLabel().equals(label)){
+        index=i;
+        break;
+      }
+    }
     if(!pieChart.getData().getDataSet().removeEntry(index))
         Toast.makeText(container.$context(), "Failed to remove entry!", Toast.LENGTH_SHORT).show();
     pieChart.getData().notifyDataChanged();
@@ -164,8 +137,7 @@ public final class PieChart extends AndroidViewComponent {
       colors.add(gnu.math.IntNum.intValue(obj));
     }
     addColorTemplates(colors);
-    Toast.makeText(container.$context(), ""+entries.size(), Toast.LENGTH_SHORT).show();
-    PieDataSet pieDataSet=new PieDataSet(entries,Title());
+    PieDataSet pieDataSet=new PieDataSet(entries,"");
     pieDataSet.setColors(colors);
     pieChart.getData().setDataSet(pieDataSet);
     pieChart.getData().notifyDataChanged();
@@ -179,7 +151,7 @@ public final class PieChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void LabelEnabled(boolean enabled) {
     pieChart.setDrawEntryLabels(enabled);
     pieChart.invalidate();
@@ -192,23 +164,13 @@ public final class PieChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True")
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void LegendEnabled(boolean enabled) {
     Legend legend=pieChart.getLegend();
     legend.setEnabled(enabled);
     pieChart.invalidate();
   }
-  /**
-   * returns whether the label is shown in chart
-   *
-   * @return a boolean balue
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "True")
-  @SimpleProperty
-  public boolean LegendEnabled() {
-    return pieChart.getLegend().isEnabled();
-  }
+
 
   
 
@@ -220,7 +182,7 @@ public final class PieChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
       defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void ValueTextColor(int argb) {
     pieChart.getData().setValueTextColor(argb);
   }
@@ -233,7 +195,7 @@ public final class PieChart extends AndroidViewComponent {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
       defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT)
-  @SimpleProperty
+  @SimpleProperty(userVisible=false)
   public void LabelTextColor(int argb) {
     pieChart.setEntryLabelColor(argb);
   }

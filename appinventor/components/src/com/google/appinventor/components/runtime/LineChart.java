@@ -39,7 +39,7 @@ import gnu.mapping.Symbol;
 
 @DesignerComponent(version = YaVersion.LINECHART_COMPONENT_VERSION,
     description = "Line Chart Component",
-    category = ComponentCategory.USERINTERFACE,
+    category = ComponentCategory.CHART,
     nonVisible = false,
     iconName = "images/lineChart.png")
 @SimpleObject
@@ -108,14 +108,28 @@ public final class LineChart extends AndroidViewComponent {
   /**
    * Add an entry to the chart
    *
-   * @param index the index of dataset
+   * @param label the label of dataset
    * @param xVal the x value of point
    * @param yVal the y value of point
    */
   @SimpleFunction(description = "Add an entry to the chart")
-  public void AddEntry(int index, float xVal, float yVal){
-    entries.get(index).add(new Entry(xVal,yVal));
-    lineChart.getData().addEntry(new Entry(xVal,yVal),index);
+  public void AddEntry(String label, float xVal, float yVal){
+    ILineDataSet iLineDataSet=lineChart.getData().getDataSetByLabel(label,false);
+    if(iLineDataSet==null){
+      Toast.makeText(container.$context(),
+              "Could not add entry: label \'"+label+"\' does not exist."
+              , Toast.LENGTH_SHORT).show();
+      return;
+    }
+    if(iLineDataSet.getEntryCount()>0&&
+        iLineDataSet.getEntryForIndex(iLineDataSet.getEntryCount()-1).getX()>xVal){
+      Toast.makeText(container.$context(), 
+      "Could not add entry: x value must be incremental."
+      , Toast.LENGTH_SHORT).show();
+      return;
+    }
+    //entries.get(index).add(new Entry(xVal,yVal));
+    iLineDataSet.addEntry(new Entry(xVal,yVal));
     lineChart.getData().notifyDataChanged();
     lineChart.notifyDataSetChanged();
     lineChart.invalidate();
@@ -146,6 +160,24 @@ public final class LineChart extends AndroidViewComponent {
     OtherTextSize(otherSize);
     ValueTextColor(valueColor);
   }
+
+  /**
+   * Remove a data set.
+   *
+   * @param label the label of dataset
+   */
+  @SimpleFunction(description = "set colors of each dataset in the chart")
+  public void RemoveDataSet(String label){
+    ILineDataSet iLineDataSet=lineChart.getData().getDataSetByLabel(label,false);
+    if(iLineDataSet==null){
+      Toast.makeText(container.$context(),
+              "Could not remove data set: label \'"+label+"\' does not exist."
+              , Toast.LENGTH_SHORT).show();
+      return;
+    }
+    lineChart.getData().removeDataSet(iLineDataSet);
+  }
+
 
   /**
    * Set x axis text of each value in the chart
@@ -225,17 +257,6 @@ public final class LineChart extends AndroidViewComponent {
     lineChart.setDragEnabled(enabled);
   }
 
-  /**
-   * If enabled, the background rectangle behind the chart
-   * drawing-area will be drawn.
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-      defaultValue = "False")
-  @SimpleProperty(userVisible=false)
-  public void DrawGridBackground(boolean enabled) {
-    lineChart.setDrawGridBackground(enabled);
-    lineChart.invalidate();
-  }
   /**
    * If enabled, the vertical axis lines will be drawn
    */
